@@ -1,44 +1,30 @@
 const express = require("express");
 const app = express();
 const port = 3000;
+const bodyParser = require("body-parser");
 
-// Imports the data from the fake database files
-const users = require("./data/users");
-const posts = require("./data/posts");
+// Our route files for users and posts
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json({extended: true}));
 
-// Index route for users
-app.get(`/api/users`, (req, res) => {
-    res.json(users);
-});
+// Points to the users and posts files in the routes folder
+const users = require(`./ruotes/users`, users);
+const posts = require(`./routes/posts`, posts);
 
-// Show route for Users
-app.get(`/api/users/:id`, (req, res) => {
-    const user = users.find((u) => u.id == req.params.id);
-    if (user) {
-        res.json(user);
-    } else {
-        res.send("User Not Found");
-    }
-});
-
-// Index route for Posts
-app.get("/api/posts", (req, res) => {
-    res.json(posts);
-});
-
-//Show route for Posts
-app.get("api/posts/:id", (req, res) => {
-    const post = posts.find((p) => p.id == req.params.id);
-    if (post) {
-        res.json(post);
-    } else {
-        res.send("Post Not Found");
-    }
+//Use our routes 
+app.use("/", (req, res) => {
+    res.send("all routes should begin with /api")
 });
 
 app.get(`/`, (req, res) => {
     res.send("All usable routes start with slash api.");
 });
+
+// 404 Middleware
+app.use((req, res) => {
+    res.status(404);
+    res.json({ error: "Resource Not Found" });
+  });
 
 app.listen(port, () => {
     console.log(`Server listening on port: ${port}.`);
